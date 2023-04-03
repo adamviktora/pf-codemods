@@ -36,30 +36,39 @@ module.exports = {
               )
               .reduce((acc, val) => acc.concat(val), []);
 
-            imports
-              .filter((spec) => !allTokens.includes(spec.local.name))
-              .forEach((spec) =>
-                context.report({
-                  node,
-                  message: `unused patternfly import ${spec.local.name}`,
-                  fix(fixer) {
-                    const getEndRange = () => {
-                      const nextComma = context
-                        .getSourceCode()
-                        .getTokenAfter(spec);
+            const unusedImports = imports.filter(
+              (spec) => !allTokens.includes(spec.local.name)
+            );
 
-                      return context.getSourceCode().getText(nextComma) === ","
-                        ? context.getSourceCode().getTokenAfter(nextComma)
-                            .range[0]
-                        : spec.range[1];
-                    };
+            if (unusedImports.length != oldNames.length) {
+              ensureImports(context, node, pfPackage, [newName]);
+            }
 
-                    return fixer.removeRange([spec.range[0], getEndRange()]);
-                  },
-                })
-              );
+            if (unusedImports.length == 0) {
+              return;
+            }
 
-            ensureImports(context, node, pfPackage, [newName]);
+            context.report({
+              node,
+              message: `unused patternfly import${
+                unusedImports.length > 1 ? "s" : ""
+              } ${unusedImports.map((spec) => spec.local.name).join(", ")}`,
+              fix(fixer) {
+                const getEndRange = (spec) => {
+                  const nextComma = context.getSourceCode().getTokenAfter(spec);
+
+                  return context.getSourceCode().getText(nextComma) === ","
+                    ? context.getSourceCode().getTokenAfter(nextComma).range[0]
+                    : spec.range[1];
+                };
+
+                return [
+                  ...unusedImports.map((spec) =>
+                    fixer.removeRange([spec.range[0], getEndRange(spec)])
+                  ),
+                ];
+              },
+            });
           },
           JSXElement(node) {
             const openingIdentifier = node.openingElement.name;
