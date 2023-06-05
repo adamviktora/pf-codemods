@@ -2,6 +2,9 @@ const { renameProps } = require('../../helpers');
 
 // https://github.com/patternfly/patternfly-react/pull/8352
 const renames = {
+  'Table': {
+    hasSelectableRowCaption: ''
+  },
   'TableComposable': {
     hasSelectableRowCaption: ''
   }

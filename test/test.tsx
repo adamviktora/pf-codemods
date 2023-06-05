@@ -305,11 +305,11 @@ const alertVariantOption = AlertVariant.default;
   <Spinner isSVG />
   <Switch onChange={(foo) => handler(foo)} />
   <Table rows={[]} />
-  <Table>
+  <Table hasSelectableRowCaption>
     <TableHeader />
     <TableBody />
   </Table>
-  <TableComposable />
+  <TableComposable hasSelectableRowCaption />
   <Tabs onToggle={(foo) => handler(foo)} />
   <Td select={tdSelectTypeObj} actions={{ disable: false }} />
   <TextArea isReadOnly isIconSprite />
